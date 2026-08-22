@@ -1,5 +1,6 @@
 import { Composition } from "remotion";
 import rideManifest from "../public/ride-clips/manifest.json";
+import type { CradleCompositionProps } from "../lib/specimen";
 import { CradleComposition } from "./compositions/CradleComposition";
 
 export const RemotionRoot = () => {
@@ -13,6 +14,13 @@ export const RemotionRoot = () => {
       fps={rideManifest.fps}
       width={rideManifest.width}
       height={rideManifest.height}
+      defaultProps={
+        {
+          selfieSrc: "",
+          specimenId: "0317",
+          outcome: "ASCENDED",
+        } satisfies CradleCompositionProps
+      }
     />
   );
 };

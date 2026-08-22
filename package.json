@@ -11,10 +11,12 @@
     "media:analyze": "node scripts/media/analyze-media.mjs",
     "media:extract": "node scripts/media/extract-clip.mjs",
     "remotion": "remotion studio remotion/index.ts",
-    "remotion:render": "remotion render remotion/index.ts EnterTheCradle output/enter-the-cradle.mp4"
+    "remotion:render": "remotion render remotion/index.ts EnterTheCradle output/enter-the-cradle.mp4",
+    "remotion:render:personalized": "node scripts/remotion/create-test-props.mjs && remotion render remotion/index.ts EnterTheCradle output/enter-the-cradle-personalized.mp4 --props=output/personalized-test-props.json"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.515",
+    "@remotion/player": "4.0.515",
     "next": "16.3.2",
     "react": "19.2.8",
     "react-dom": "19.2.8",

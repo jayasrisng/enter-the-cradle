@@ -24,7 +24,19 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 The mobile-first intake flow runs entirely in the browser: begin the session, choose a selfie, process the fictional scan, and receive a persistent four-digit specimen ID. JPEG, PNG, and WebP images up to 12 MB are supported. HEIC/HEIF images display a conversion prompt rather than failing silently.
 
-Selfies are normalized locally for preview and are not uploaded or stored by the Prompt 4 experience. The final **Enter the Cradle** action currently stops at the handoff state; personalized ride rendering is implemented in the following prompts.
+Selfies are normalized locally for preview and are not uploaded or stored by the intake experience. The final **Enter the Cradle** action opens the personalized ride preview on the same device.
+
+## Personalized ride
+
+The Remotion composition accepts `selfieSrc`, `specimenId`, and `outcome` inputs. It places the portrait in three authored moments: human detection, an animated containment orb during the ride, and the final verdict. The web experience passes the current local selfie and session identity directly into a Remotion Player when the user selects **Enter the Cradle**.
+
+For a local MP4 proof, add an approved JPEG at `local-assets/test-selfie.jpg`, then run:
+
+```bash
+pnpm remotion:render:personalized
+```
+
+This creates `output/enter-the-cradle-personalized.mp4`. Both the local portrait and rendered video are ignored by Git. The server-side render/download pipeline is intentionally deferred to Prompt 6.
 
 ## Local media
 
@@ -43,6 +55,7 @@ pnpm media:analyze      # Analyze source footage and build contact sheets
 pnpm media:extract --   # Extract and normalize a candidate clip
 pnpm remotion           # Open Remotion Studio
 pnpm remotion:render    # Render the placeholder composition to output/
+pnpm remotion:render:personalized # Render with ignored local test props
 ```
 
 The Remotion composition is only a validated placeholder in the bootstrap phase. Ride footage selection and the final personalized video are implemented in later phases.

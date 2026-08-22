@@ -1,19 +1,21 @@
 "use client";
 
 import Image from "next/image";
+import { Player } from "@remotion/player";
 import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent, CSSProperties } from "react";
+import { SPECIMEN_OUTCOMES } from "@/lib/specimen";
+import type { SpecimenOutcome } from "@/lib/specimen";
+import { CradleComposition } from "@/remotion/compositions/CradleComposition";
 
-type Stage = "landing" | "upload" | "scanning" | "acquired";
-type Outcome = "ACCEPTED" | "ASCENDED" | "CONSUMED" | "REJECTED";
-type SpecimenIdentity = { specimenId: string; outcome: Outcome };
+type Stage = "landing" | "upload" | "scanning" | "acquired" | "ride";
+type SpecimenIdentity = { specimenId: string; outcome: SpecimenOutcome };
 
 const SESSION_KEY = "enter-the-cradle:specimen";
 const MAX_FILE_SIZE = 12 * 1024 * 1024;
 const MAX_IMAGE_EDGE = 2048;
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const ALLOWED_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp"]);
-const OUTCOMES: Outcome[] = ["ACCEPTED", "ASCENDED", "CONSUMED", "REJECTED"];
 const diagnostics = [
   ["CRANIUM", "ACCEPTABLE"],
   ["MEMORIES", "QUESTIONABLE"],
@@ -26,7 +28,7 @@ function createIdentity(): SpecimenIdentity {
   crypto.getRandomValues(randomValues);
   return {
     specimenId: String(randomValues[0] % 10000).padStart(4, "0"),
-    outcome: OUTCOMES[randomValues[1] % OUTCOMES.length],
+    outcome: SPECIMEN_OUTCOMES[randomValues[1] % SPECIMEN_OUTCOMES.length],
   };
 }
 
@@ -35,7 +37,10 @@ function getSessionIdentity(): SpecimenIdentity {
   if (storedIdentity) {
     try {
       const parsedIdentity = JSON.parse(storedIdentity) as SpecimenIdentity;
-      if (/^\d{4}$/.test(parsedIdentity.specimenId)) return parsedIdentity;
+      if (
+        /^\d{4}$/.test(parsedIdentity.specimenId) &&
+        SPECIMEN_OUTCOMES.includes(parsedIdentity.outcome)
+      ) return parsedIdentity;
     } catch {
       sessionStorage.removeItem(SESSION_KEY);
     }
@@ -121,7 +126,6 @@ export function SpecimenExperience() {
   const [normalizedSelfie, setNormalizedSelfie] = useState<Blob | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isPreparingImage, setIsPreparingImage] = useState(false);
-  const [entryAcknowledged, setEntryAcknowledged] = useState(false);
   const previewUrlRef = useRef<string | null>(null);
   const scanTimerRef = useRef<number | null>(null);
 
@@ -173,7 +177,6 @@ export function SpecimenExperience() {
 
   function processSpecimen() {
     if (!normalizedSelfie || !previewUrl) return;
-    setEntryAcknowledged(false);
     setStage("scanning");
     scanTimerRef.current = window.setTimeout(() => {
       setStage("acquired");
@@ -259,8 +262,35 @@ export function SpecimenExperience() {
             <p className="specimen-number">SPECIMEN #{identity?.specimenId ?? "----"}</p>
             <h1>SPECIMEN ACQUIRED</h1>
             <p className="ready-question">READY TO ENTER THE CRADLE?</p>
-            <button className="primary-action" type="button" onClick={() => setEntryAcknowledged(true)}><span>{entryAcknowledged ? "CRADLE LINK READY" : "ENTER THE CRADLE"}</span><b aria-hidden="true">↘</b></button>
-            {entryAcknowledged && <p className="handoff-status" role="status">RIDE CONNECTION RESERVED // PERSONALIZATION FOLLOWS</p>}
+            <button className="primary-action" type="button" onClick={() => setStage("ride")}><span>ENTER THE CRADLE</span><b aria-hidden="true">↘</b></button>
+          </div>
+        )}
+
+        {stage === "ride" && previewUrl && identity && (
+          <div className="screen screen-ride">
+            <div className="ride-heading">
+              <p className="overline">LIVE CRADLE LINK</p>
+              <p>{`SPECIMEN #${identity.specimenId} // VERDICT SEALED`}</p>
+            </div>
+            <div className="ride-player-shell">
+              <Player
+                component={CradleComposition}
+                inputProps={{
+                  selfieSrc: previewUrl,
+                  specimenId: identity.specimenId,
+                  outcome: identity.outcome,
+                }}
+                durationInFrames={450}
+                compositionWidth={1080}
+                compositionHeight={1920}
+                fps={30}
+                autoPlay
+                controls
+                style={{ height: "100%", width: "100%" }}
+              />
+            </div>
+            <p className="ride-note">YOUR IMAGE REMAINS ON THIS DEVICE</p>
+            <button className="secondary-action ride-again" type="button" onClick={() => setStage("acquired")}>RETURN TO VERDICT GATE</button>
           </div>
         )}
       </section>
