@@ -28,7 +28,9 @@ Selfies are normalized locally for preview and are not uploaded or stored by the
 
 ## Personalized ride
 
-The Remotion composition accepts `selfieSrc`, `specimenId`, and `outcome` inputs. It places the portrait in three authored moments: human detection, an animated containment orb during the ride, and the final verdict. The web experience passes the current local selfie and session identity directly into a Remotion Player when the user selects **Enter the Cradle**.
+The Remotion composition accepts `selfieSrc`, `specimenId`, and `outcome` inputs. Prompt 5.5 turns the portrait into a deterministic 2.5D “living specimen” character: the real face sits inside a procedural biomechanical helmet and suit with independently animated head, torso, arms, cables, reactor light, breathing, recoil, falling, containment, and scene-matched effects. The character appears during assembly, descent, impact, containment, climax, and the final verdict.
+
+This is an authored character illusion, not a photorealistic face swap or generated human performance. It requires only one selfie, uses no external AI API, and keeps the image local in the browser preview. The exact product boundary and acceptance criteria are documented in `docs/prompt-5-5-scope.md` and `docs/prompt-5-5-prd.md`.
 
 For a local MP4 proof, add an approved JPEG at `local-assets/test-selfie.jpg`, then run:
 
