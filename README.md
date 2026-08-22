@@ -64,3 +64,21 @@ pnpm media:extract -- local-assets/source/ride.mov 00:01:12.500 00:01:18.000 02-
 ```
 
 The clip is written to `public/ride-clips/02-drop.mp4` as H.264 video with AAC audio, even dimensions, 30 FPS and web-optimized MP4 metadata. Timestamps accept seconds or `HH:MM:SS.mmm` notation.
+
+## Base ride composition
+
+The selected 15-second edit is described by `public/ride-clips/manifest.json`. The manifest records each local clip, its duration, source timestamps and intended story role. Video files under `public/ride-clips/` remain ignored by Git.
+
+Preview the sequence in Remotion Studio:
+
+```bash
+pnpm remotion
+```
+
+Render the 1080×1920 test ride:
+
+```bash
+pnpm remotion:render
+```
+
+The generated video is written to `output/enter-the-cradle.mp4` and remains local-only.

@@ -1,36 +1,37 @@
-import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
+import { AbsoluteFill, OffthreadVideo, Sequence, staticFile } from "remotion";
+import rideManifest from "../../public/ride-clips/manifest.json";
+
+const clipDurations = rideManifest.clips.map((clip) =>
+  Math.round(clip.durationSeconds * rideManifest.fps),
+);
 
 export const CradleComposition = () => {
-  const frame = useCurrentFrame();
-  const opacity = interpolate(frame, [0, 18, 72, 89], [0, 1, 1, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
   return (
-    <AbsoluteFill
-      style={{
-        alignItems: "center",
-        backgroundColor: "#050506",
-        color: "#e6e0d6",
-        display: "flex",
-        fontFamily: "Arial, Helvetica, sans-serif",
-        justifyContent: "center",
-      }}
-    >
-      <div style={{ opacity, textAlign: "center" }}>
-        <div
-          style={{
-            color: "#8dbfc1",
-            fontSize: 22,
-            letterSpacing: 8,
-            marginBottom: 42,
-          }}
-        >
-          NIIRO // SYSTEM TEST
-        </div>
-        <div style={{ fontSize: 88, letterSpacing: -5 }}>ENTER THE CRADLE</div>
-      </div>
+    <AbsoluteFill style={{ backgroundColor: "#050506" }}>
+      {rideManifest.clips.map((clip, index) => {
+        const durationInFrames = clipDurations[index];
+        const sequenceStart = clipDurations
+          .slice(0, index)
+          .reduce((total, duration) => total + duration, 0);
+
+        return (
+          <Sequence
+            key={clip.filename}
+            from={sequenceStart}
+            durationInFrames={durationInFrames}
+            name={clip.role}
+          >
+            <OffthreadVideo
+              src={staticFile(`ride-clips/${clip.filename}`)}
+              style={{
+                height: "100%",
+                objectFit: "cover",
+                width: "100%",
+              }}
+            />
+          </Sequence>
+        );
+      })}
     </AbsoluteFill>
   );
 };

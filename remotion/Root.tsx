@@ -1,4 +1,5 @@
 import { Composition } from "remotion";
+import rideManifest from "../public/ride-clips/manifest.json";
 import { CradleComposition } from "./compositions/CradleComposition";
 
 export const RemotionRoot = () => {
@@ -6,10 +7,12 @@ export const RemotionRoot = () => {
     <Composition
       id="EnterTheCradle"
       component={CradleComposition}
-      durationInFrames={90}
-      fps={30}
-      width={1080}
-      height={1920}
+      durationInFrames={Math.round(
+        rideManifest.durationSeconds * rideManifest.fps,
+      )}
+      fps={rideManifest.fps}
+      width={rideManifest.width}
+      height={rideManifest.height}
     />
   );
 };

@@ -1,0 +1,52 @@
+{
+  "title": "Enter the Cradle — Base Ride",
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "durationSeconds": 15,
+  "source": "local-assets/source/film.mp4",
+  "clips": [
+    {
+      "filename": "01-intro.mp4",
+      "durationSeconds": 2,
+      "sourceStartSeconds": 846.2,
+      "sourceEndSeconds": 848.2,
+      "role": "human/specimen detection"
+    },
+    {
+      "filename": "02-drop.mp4",
+      "durationSeconds": 2.8,
+      "sourceStartSeconds": 850,
+      "sourceEndSeconds": 852.8,
+      "role": "enter and drop into the prismatic world"
+    },
+    {
+      "filename": "03-impact.mp4",
+      "durationSeconds": 2.7,
+      "sourceStartSeconds": 1050.5,
+      "sourceEndSeconds": 1053.2,
+      "role": "city-scale impact and chaos"
+    },
+    {
+      "filename": "04-tunnel.mp4",
+      "durationSeconds": 2.5,
+      "sourceStartSeconds": 872,
+      "sourceEndSeconds": 874.5,
+      "role": "fast capsule movement and escalation"
+    },
+    {
+      "filename": "05-creature.mp4",
+      "durationSeconds": 3,
+      "sourceStartSeconds": 1111.4,
+      "sourceEndSeconds": 1114.4,
+      "role": "giant creature climax"
+    },
+    {
+      "filename": "06-final.mp4",
+      "durationSeconds": 2,
+      "sourceStartSeconds": 1454,
+      "sourceEndSeconds": 1456,
+      "role": "blue-lit creature portrait and verdict handoff"
+    }
+  ]
+}
