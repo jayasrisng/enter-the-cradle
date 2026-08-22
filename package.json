@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "media:analyze": "node scripts/media/analyze-media.mjs",
+    "media:extract": "node scripts/media/extract-clip.mjs",
     "remotion": "remotion studio remotion/index.ts",
     "remotion:render": "remotion render remotion/index.ts EnterTheCradle output/enter-the-cradle.mp4"
   },
