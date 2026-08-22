@@ -29,8 +29,7 @@ output/*
 *.mkv
 
 # Source footage stays local
-public/source-footage/*
-!public/source-footage/.gitkeep
+local-assets/
 
 # Environment variables (keep examples/templates if added later)
 .env
@@ -51,6 +50,9 @@ pnpm-debug.log*
 .vscode/
 *.swp
 *.swo
+
+# Private local planning documents
+Enter the Cradle — Codex Build Prompts.md
 
 # Deployment providers
 .vercel/

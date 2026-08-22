@@ -1,0 +1,160 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #050506;
+  --bone: #e6e0d6;
+  --muted: #817d78;
+  --cradle-red: #8f241f;
+  --signal: #8dbfc1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--bone);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.cradle-shell {
+  position: relative;
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  overflow: hidden;
+  padding: 24px;
+  background:
+    linear-gradient(180deg, rgb(5 5 6 / 12%), rgb(5 5 6 / 92%)),
+    radial-gradient(circle at 50% 35%, #23100f 0, #090809 42%, #050506 72%);
+}
+
+.cradle-shell::before {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    transparent 39px,
+    rgb(255 255 255 / 2%) 40px
+  );
+  content: "";
+  mask-image: linear-gradient(to bottom, transparent, black 24%, black 76%, transparent);
+}
+
+.cradle-panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 520px);
+  padding: 40px 28px 30px;
+  border: 1px solid rgb(230 224 214 / 14%);
+  background: rgb(7 7 8 / 62%);
+  box-shadow: 0 28px 100px rgb(0 0 0 / 55%);
+  backdrop-filter: blur(18px);
+}
+
+.eyebrow,
+.status,
+.system-line {
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--signal);
+  font-size: 0.66rem;
+}
+
+.signal {
+  display: flex;
+  gap: 5px;
+  margin: 42px 0 22px;
+}
+
+.signal span {
+  width: 34px;
+  height: 2px;
+  background: var(--cradle-red);
+}
+
+.signal span:nth-child(2) {
+  opacity: 0.52;
+}
+
+.signal span:nth-child(3) {
+  opacity: 0.2;
+}
+
+h1 {
+  max-width: 360px;
+  margin: 0;
+  font-size: clamp(2.6rem, 13vw, 5.6rem);
+  font-weight: 500;
+  letter-spacing: -0.075em;
+  line-height: 0.82;
+}
+
+.status {
+  margin: 24px 0 70px;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.system-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 14px;
+  border-top: 1px solid rgb(230 224 214 / 12%);
+  color: var(--muted);
+  font-size: 0.56rem;
+  line-height: 1.5;
+}
+
+.system-line strong {
+  color: var(--bone);
+  font-weight: 400;
+  text-align: right;
+}
+
+.ambient {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(80px);
+  opacity: 0.22;
+}
+
+.ambient-one {
+  top: 6%;
+  left: -18%;
+  width: 54vw;
+  height: 54vw;
+  background: var(--cradle-red);
+}
+
+.ambient-two {
+  right: -30%;
+  bottom: 2%;
+  width: 62vw;
+  height: 62vw;
+  background: #183c3e;
+}
+
+@media (min-width: 640px) {
+  .cradle-panel {
+    padding: 54px 48px 38px;
+  }
+}
