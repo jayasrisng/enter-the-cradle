@@ -20,6 +20,12 @@ pnpm dev
 
 Then open [http://localhost:3000](http://localhost:3000).
 
+## Specimen intake
+
+The mobile-first intake flow runs entirely in the browser: begin the session, choose a selfie, process the fictional scan, and receive a persistent four-digit specimen ID. JPEG, PNG, and WebP images up to 12 MB are supported. HEIC/HEIF images display a conversion prompt rather than failing silently.
+
+Selfies are normalized locally for preview and are not uploaded or stored by the Prompt 4 experience. The final **Enter the Cradle** action currently stops at the handoff state; personalized ride rendering is implemented in the following prompts.
+
 ## Local media
 
 Place approved original videos in `local-assets/source/`. Extracted ride clips belong in `public/ride-clips/`, and generated analysis or rendered videos belong in `output/`.
