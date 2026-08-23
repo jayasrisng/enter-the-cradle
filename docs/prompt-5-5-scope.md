@@ -1,44 +1,47 @@
-# Prompt 5.5 Scope — Living Specimen Character
+# Prompt 5.5 Scope — Silent Astronaut Cameo
 
 ## Objective
 
-Make the uploaded person feel like an active character inside the ride using a deterministic 2.5D character rig that can be previewed and rendered locally.
-
-The experience should deliver the emotional impression of “that is me inside the machine” without claiming photorealistic face replacement or generating a new performance from a single photograph.
+Make the uploaded person feel present inside the Niiro ride without replacing or interrupting the approved film. The complete ride continues playing while a silent astronaut containing the user's recognizable face briefly drops into selected scenes, stands near a lower corner, and fades away.
 
 ## What We Are Building
 
-- A reusable biomechanical character rig driven by the existing selfie input.
-- A film-world costume made from procedural Remotion layers: helmet, face aperture, collar, shoulders, torso shell, harness, cables, chest reactor, and diagnostic markings.
-- Independent motion for the head, torso, limbs, cables, and lighting so the character appears to breathe, brace, fall, and react.
-- Scene-specific character appearances during detection, descent, impact/containment, and final verdict.
-- Lighting, blur, shake, scale, rotation, occlusion, scan lines, and glitch effects matched to the ride footage.
-- The same specimen ID and outcome throughout the interface and composition.
-- A browser preview and a verified 1080×1920 MP4 test render.
+- A reusable astronaut specimen made from an original transparent suit plate and the existing selfie input.
+- A face-only crop placed inside the astronaut helmet so one selfie is sufficient and body ambiguity is avoided.
+- Four short, silent corner cameos timed to relevant moments in the ride.
+- A restrained drop-in, idle breathing drift, scene-matched lighting, and fade-out for each cameo.
+- A final cinematic zoom toward the astronaut and helmet while the underlying ride continues.
+- The approved end message in a tall Gothic display style:
+  - `HUMAN DETECTED`
+  - `AT`
+  - `POMEGRANATE`
+  - `PREMIERE SHOW // SPECIMEN #[ID]`
+- A selfie-first intake action, browser preview, and verified 1080×1920 MP4 test render.
 
 ## Explicit Non-Goals
 
-- Photorealistic face swap, talking avatar, lip sync, or newly generated facial expressions.
-- Fully reconstructed 3D body, pose estimation, motion capture, or camera tracking.
-- External image/video generation APIs, paid services, accounts, or cloud storage.
-- A promise that the generated body exactly matches the user’s body, clothing, gender presentation, or physical traits.
-- Server-side user rendering, download delivery, and production rendering infrastructure; those remain Prompt 6.
+- A talking avatar, lip sync, face swap, or generated human performance.
+- Reconstructing the user's body, clothing, pose, or movement from the selfie.
+- Re-editing, replacing, or shortening the approved Niiro footage.
+- Letting the astronaut obscure Niiro or the primary action.
+- External image/video-generation calls during a user's session.
+- Server rendering, storage, download delivery, and production render infrastructure; those remain Prompt 6.
 
 ## Product Constraints
 
-- The face must stay recognizable and must not be heavily warped.
-- The costume is fictional protective equipment, not a claim about the user’s real appearance.
-- The feature must work with one front-facing selfie.
+- The face must remain recognizable and may only be cropped, scaled, and subtly color-treated.
+- The astronaut is fictional protective equipment, not a representation of the user's real body.
+- The astronaut is silent and stays near a lower screen corner during ride cameos.
 - Uploaded images remain local during Prompt 5.5.
-- Existing source footage and generated videos remain ignored by Git.
-- The complete ride remains approximately 15 seconds at 1080×1920 and 30 FPS.
+- Existing source footage, test selfies, and rendered output remain ignored by Git.
+- The ride remains approximately 15 seconds at 1080×1920 and 30 FPS.
 
 ## Definition of Done
 
-Prompt 5.5 is complete when a local selfie produces a ride in which the same recognizable character:
+Prompt 5.5 is complete when one local selfie produces a ride in which:
 
-1. Is assembled/scanned in costume.
-2. Falls or braces inside the ride with multi-part body motion.
-3. Appears contained during an intense source clip with scene-matched effects.
-4. Returns in costume on the final verdict screen.
-5. Plays through the existing web experience and renders successfully to MP4.
+1. The approved source video remains continuously visible and audible.
+2. The same astronaut drops in and fades out during four selected scenes.
+3. The astronaut never blocks the scene's main subject.
+4. The ending zooms into the astronaut and presents the approved Pomegranate detection message.
+5. The experience plays in the browser and renders successfully to MP4.

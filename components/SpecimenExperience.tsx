@@ -217,8 +217,8 @@ export function SpecimenExperience() {
           <div className="screen screen-upload">
             <div className="screen-heading">
               <p className="overline">HUMAN MATERIAL REQUIRED</p>
-              <h1>OFFER YOUR FACE.</h1>
-              <p>One clear, front-facing image. It never leaves this device.</p>
+              <h1>TAKE YOUR PLACE.</h1>
+              <p>Center your face and look toward the camera. Your face will appear inside the specimen helmet.</p>
             </div>
             <div className={`selfie-port ${previewUrl ? "has-image" : ""}`}>
               {previewUrl ? (
@@ -229,7 +229,9 @@ export function SpecimenExperience() {
               <span className="corner corner-one" /><span className="corner corner-two" /><span className="corner corner-three" /><span className="corner corner-four" />
             </div>
             <div className="upload-actions">
-              <label className="secondary-action" htmlFor="selfie-upload">{isPreparingImage ? "PREPARING IMAGE…" : previewUrl ? "CHOOSE ANOTHER" : "SELECT SELFIE"}</label>
+              <label className="secondary-action" htmlFor="selfie-camera">{isPreparingImage ? "PREPARING IMAGE…" : "TAKE SELFIE"}</label>
+              <input id="selfie-camera" className="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" capture="user" onChange={handleImageSelection} disabled={isPreparingImage} />
+              <label className="secondary-action" htmlFor="selfie-upload">CHOOSE PHOTO</label>
               <input id="selfie-upload" className="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" onChange={handleImageSelection} disabled={isPreparingImage} />
               {previewUrl && <button className="text-action" type="button" onClick={resetSelfie}>REMOVE</button>}
             </div>

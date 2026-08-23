@@ -15,6 +15,7 @@
     "remotion:render:personalized": "node scripts/remotion/create-test-props.mjs && remotion render remotion/index.ts EnterTheCradle output/enter-the-cradle-personalized.mp4 --props=output/personalized-test-props.json"
   },
   "dependencies": {
+    "@fontsource/pirata-one": "^5.3.0",
     "@remotion/cli": "^4.0.515",
     "@remotion/player": "4.0.515",
     "next": "16.3.2",

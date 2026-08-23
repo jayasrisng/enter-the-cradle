@@ -28,9 +28,9 @@ Selfies are normalized locally for preview and are not uploaded or stored by the
 
 ## Personalized ride
 
-The Remotion composition accepts `selfieSrc`, `specimenId`, and `outcome` inputs. Prompt 5.5 turns the portrait into a deterministic 2.5D “living specimen” character: the real face sits inside a procedural biomechanical helmet and suit with independently animated head, torso, arms, cables, reactor light, breathing, recoil, falling, containment, and scene-matched effects. The character appears during assembly, descent, impact, containment, climax, and the final verdict.
+The Remotion composition accepts `selfieSrc`, `specimenId`, and `outcome` inputs. Prompt 5.5 places the participant's cropped face inside an original astronaut specimen. The complete approved ride keeps playing while the silent astronaut briefly drops into alternating lower corners, holds with restrained breathing motion, and fades away. The finale zooms toward the helmet and presents the Pomegranate human-detection message in a tall Gothic display style.
 
-This is an authored character illusion, not a photorealistic face swap or generated human performance. It requires only one selfie, uses no external AI API, and keeps the image local in the browser preview. The exact product boundary and acceptance criteria are documented in `docs/prompt-5-5-scope.md` and `docs/prompt-5-5-prd.md`.
+This is an authored character illusion, not a photorealistic face swap or generated human performance. It requires only one selfie, uses no external AI API at runtime, and keeps the image local in the browser preview. The exact product boundary and acceptance criteria are documented in `docs/prompt-5-5-scope.md` and `docs/prompt-5-5-prd.md`.
 
 For a local MP4 proof, add an approved JPEG at `local-assets/test-selfie.jpg`, then run:
 
@@ -60,7 +60,7 @@ pnpm remotion:render    # Render the placeholder composition to output/
 pnpm remotion:render:personalized # Render with ignored local test props
 ```
 
-The Remotion composition is only a validated placeholder in the bootstrap phase. Ride footage selection and the final personalized video are implemented in later phases.
+The Remotion composition includes the selected ride footage and the Prompt 5.5 astronaut personalization. Production rendering and downloadable delivery remain Prompt 6 work.
 
 ## Source-footage analysis
 

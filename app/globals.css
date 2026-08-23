@@ -173,7 +173,7 @@ button, label { -webkit-tap-highlight-color: transparent; }
 .corner-three { right: 10px; bottom: 10px; border-right: 1px solid; border-bottom: 1px solid; }
 .corner-four { bottom: 10px; left: 10px; border-bottom: 1px solid; border-left: 1px solid; }
 
-.upload-actions { display: flex; align-items: center; justify-content: center; gap: 18px; margin-bottom: 22px; }
+.upload-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin-bottom: 22px; }
 .secondary-action { min-height: 42px; padding: 0 16px; border-color: rgb(232 224 213 / 18%); background: rgb(255 255 255 / 2%); color: var(--muted); font-size: 0.55rem; }
 .secondary-action:hover, .secondary-action:focus-visible { border-color: rgb(155 200 199 / 55%); color: var(--bone); }
 .text-action { padding: 8px 0; border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 0.52rem; letter-spacing: 0.16em; }
