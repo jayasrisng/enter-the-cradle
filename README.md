@@ -38,9 +38,9 @@ For a local MP4 proof, add an approved JPEG at `local-assets/test-selfie.jpg`, t
 pnpm remotion:render:personalized
 ```
 
-This creates `output/enter-the-cradle-personalized.mp4`. Both the local portrait and rendered video are ignored by Git. The server-side render/download pipeline is intentionally deferred to Prompt 6.
+This creates `output/enter-the-cradle-personalized.mp4`. Both the local portrait and rendered video are ignored by Git. In the browser, supported devices can also render the personalized composition directly to a 540×960 MP4 for download or sharing; no uploaded selfie or server render is required.
 
-The browser experience can download a personalized specimen card as PNG and share that card through the device share sheet (or copy the experience link when native sharing is unavailable). These exports are created locally and only leave the device when the participant explicitly shares them.
+The browser experience downloads the personalized ride as MP4 and shares the video through the device share sheet (or copies the experience link when file sharing is unavailable). Video rendering uses WebCodecs and works best in desktop Chrome or a recent mobile browser. Exports are created locally and only leave the device when the participant explicitly shares them.
 
 ## Local media
 

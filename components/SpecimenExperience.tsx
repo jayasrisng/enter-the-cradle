@@ -127,79 +127,74 @@ export function SpecimenExperience() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [normalizedSelfie, setNormalizedSelfie] = useState<Blob | null>(null);
   const [shareStatus, setShareStatus] = useState("");
+  const [isRenderingVideo, setIsRenderingVideo] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isPreparingImage, setIsPreparingImage] = useState(false);
   const previewUrlRef = useRef<string | null>(null);
+  const renderedVideoRef = useRef<Blob | null>(null);
 
-  async function createSpecimenCard() {
+  async function renderPersonalizedVideo() {
+    if (renderedVideoRef.current) return renderedVideoRef.current;
     if (!previewUrl || !identity) throw new Error("Specimen unavailable.");
-    const portrait = new window.Image();
-    await new Promise<void>((resolve, reject) => {
-      portrait.onload = () => resolve();
-      portrait.onerror = () => reject(new Error("Portrait could not be loaded."));
-      portrait.src = previewUrl;
-    });
-    const canvas = document.createElement("canvas");
-    canvas.width = 1080;
-    canvas.height = 1350;
-    const context = canvas.getContext("2d");
-    if (!context) throw new Error("Card could not be created.");
-    const gradient = context.createLinearGradient(0, 0, 1080, 1350);
-    gradient.addColorStop(0, "#061517");
-    gradient.addColorStop(0.55, "#050506");
-    gradient.addColorStop(1, "#210909");
-    context.fillStyle = gradient;
-    context.fillRect(0, 0, 1080, 1350);
-    context.strokeStyle = "rgba(155,200,199,.55)";
-    context.lineWidth = 3;
-    context.strokeRect(54, 54, 972, 1242);
-    context.save();
-    context.beginPath();
-    context.ellipse(540, 500, 300, 275, 0, 0, Math.PI * 2);
-    context.clip();
-    context.drawImage(portrait, 230, 190, 620, 620);
-    context.restore();
-    context.strokeStyle = "#d8d2c7";
-    context.lineWidth = 18;
-    context.beginPath();
-    context.ellipse(540, 500, 315, 290, 0, 0, Math.PI * 2);
-    context.stroke();
-    context.textAlign = "center";
-    context.fillStyle = "#f0ede5";
-    context.font = "700 86px Georgia, serif";
-    context.fillText("HUMAN DETECTED", 540, 920);
-    context.fillStyle = "#9bc8c7";
-    context.font = "24px Arial, sans-serif";
-    context.fillText("AT", 540, 980);
-    context.fillStyle = "#f0ede5";
-    context.font = "700 94px Georgia, serif";
-    context.fillText("POMEGRANATE", 540, 1080);
-    context.fillStyle = "#d8d2c7";
-    context.font = "24px Arial, sans-serif";
-    context.fillText(`PREMIERE SHOW // SPECIMEN #${identity.specimenId}`, 540, 1150);
-    return new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Card export failed.")), "image/png"));
+    setIsRenderingVideo(true);
+    setShareStatus("PREPARING VIDEO // 0%");
+    try {
+      const { canRenderMediaOnWeb, renderMediaOnWeb } = await import("@remotion/web-renderer");
+      const support = await canRenderMediaOnWeb({ container: "mp4", videoCodec: "h264", audioCodec: "aac", width: 540, height: 960 });
+      if (!support.canRender) throw new Error(support.issues.map((issue) => issue.message).join(" "));
+      const result = await renderMediaOnWeb({
+        composition: {
+          component: CradleComposition,
+          id: "EnterTheCradleDownload",
+          width: 1080,
+          height: 1920,
+          fps: 30,
+          durationInFrames: 450,
+          defaultProps: { selfieSrc: previewUrl, specimenId: identity.specimenId, outcome: identity.outcome },
+        },
+        inputProps: { selfieSrc: previewUrl, specimenId: identity.specimenId, outcome: identity.outcome },
+        container: "mp4",
+        videoCodec: "h264",
+        audioCodec: "aac",
+        videoBitrate: "medium",
+        audioBitrate: "medium",
+        hardwareAcceleration: "prefer-hardware",
+        scale: 0.5,
+        onProgress: ({ progress }) => setShareStatus(`PREPARING VIDEO // ${Math.round(progress * 100)}%`),
+      });
+      const blob = await result.getBlob();
+      renderedVideoRef.current = blob;
+      setShareStatus("VIDEO READY");
+      return blob;
+    } finally {
+      setIsRenderingVideo(false);
+    }
   }
 
-  async function downloadSpecimenCard() {
+  async function downloadSpecimenVideo() {
     try {
-      const blob = await createSpecimenCard();
+      const blob = await renderPersonalizedVideo();
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `enter-the-cradle-${identity?.specimenId ?? "specimen"}.png`;
+      anchor.download = `enter-the-cradle-${identity?.specimenId ?? "specimen"}.mp4`;
       anchor.click();
-      URL.revokeObjectURL(url);
-      setShareStatus("SPECIMEN CARD DOWNLOADED");
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setShareStatus("PERSONALIZED VIDEO DOWNLOADED");
     } catch {
-      setShareStatus("DOWNLOAD FAILED — TRY AGAIN");
+      setShareStatus("VIDEO RENDERING NEEDS DESKTOP CHROME OR A RECENT MOBILE BROWSER");
     }
   }
 
   async function shareSpecimen() {
     const text = `Human detected at the Pomegranate premiere show — Specimen #${identity?.specimenId}.`;
     try {
-      const blob = await createSpecimenCard();
-      const file = new File([blob], `enter-the-cradle-${identity?.specimenId}.png`, { type: "image/png" });
+      if (!renderedVideoRef.current) {
+        await renderPersonalizedVideo();
+        setShareStatus("VIDEO READY — TAP SHARE AGAIN");
+        return;
+      }
+      const file = new File([renderedVideoRef.current], `enter-the-cradle-${identity?.specimenId}.mp4`, { type: "video/mp4" });
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         await navigator.share({ title: "Enter the Cradle", text, files: [file] });
       } else if (navigator.share) {
@@ -209,7 +204,7 @@ export function SpecimenExperience() {
         setShareStatus("SHARE LINK COPIED");
         return;
       }
-      setShareStatus("TRANSMISSION SHARED");
+      setShareStatus("VIDEO TRANSMISSION SHARED");
     } catch (error) {
       if ((error as Error).name !== "AbortError") setShareStatus("SHARE FAILED — TRY AGAIN");
     }
@@ -255,6 +250,8 @@ export function SpecimenExperience() {
       previewUrlRef.current = nextPreviewUrl;
       setPreviewUrl(nextPreviewUrl);
       setNormalizedSelfie(normalizedImage);
+      renderedVideoRef.current = null;
+      setShareStatus("");
     } catch {
       setUploadError("The image could not be read. Try exporting it as a standard JPEG and upload it again.");
     } finally {
@@ -276,6 +273,8 @@ export function SpecimenExperience() {
     previewUrlRef.current = null;
     setPreviewUrl(null);
     setNormalizedSelfie(null);
+    renderedVideoRef.current = null;
+    setShareStatus("");
     setUploadError(null);
   }
 
@@ -380,8 +379,8 @@ export function SpecimenExperience() {
             </div>
             <p className="ride-note">YOUR IMAGE REMAINS ON THIS DEVICE</p>
             <div className="ride-actions">
-              <button className="secondary-action" type="button" onClick={downloadSpecimenCard}>DOWNLOAD CARD</button>
-              <button className="secondary-action" type="button" onClick={shareSpecimen}>SHARE EXPERIENCE</button>
+              <button className="secondary-action" type="button" onClick={downloadSpecimenVideo} disabled={isRenderingVideo}>{isRenderingVideo ? "RENDERING…" : "DOWNLOAD VIDEO"}</button>
+              <button className="secondary-action" type="button" onClick={shareSpecimen} disabled={isRenderingVideo}>SHARE VIDEO</button>
             </div>
             {shareStatus && <p className="ride-share-status" role="status">{shareStatus}</p>}
             <button className="secondary-action ride-again" type="button" onClick={() => setStage("acquired")}>RETURN TO VERDICT GATE</button>
