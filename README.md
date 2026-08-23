@@ -28,7 +28,7 @@ Selfies are normalized locally for preview and are not uploaded or stored by the
 
 ## Personalized ride
 
-The Remotion composition accepts `selfieSrc`, `specimenId`, and `outcome` inputs. Prompt 5.5 places the participant's cropped face inside an original astronaut specimen. The complete approved ride keeps playing while the silent astronaut briefly drops into alternating lower corners, holds with restrained breathing motion, and fades away. The finale zooms toward the helmet and presents the Pomegranate human-detection message in a tall Gothic display style.
+The Remotion composition accepts `selfieSrc`, `specimenId`, and `outcome` inputs. Prompt 5.5 creates a face-focused local crop and places it inside the visor of an original astronaut specimen. The complete approved ride keeps playing while the silent astronaut stays physically grounded: kneeling in battlefield shots, lying prone and tracking the pinball, and standing on the ground before the final helmet zoom. The finale presents the Pomegranate human-detection message in a tall Gothic display style.
 
 This is an authored character illusion, not a photorealistic face swap or generated human performance. It requires only one selfie, uses no external AI API at runtime, and keeps the image local in the browser preview. The exact product boundary and acceptance criteria are documented in `docs/prompt-5-5-scope.md` and `docs/prompt-5-5-prd.md`.
 

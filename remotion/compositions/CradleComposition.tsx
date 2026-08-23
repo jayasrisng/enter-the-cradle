@@ -12,6 +12,7 @@ import {
 import type { CradleCompositionProps } from "../../lib/specimen";
 import rideManifest from "../../public/ride-clips/manifest.json";
 import { AstronautSpecimen } from "../components/AstronautSpecimen";
+import type { AstronautPose } from "../components/AstronautSpecimen";
 
 const clipDurations = rideManifest.clips.map((clip) =>
   Math.round(clip.durationSeconds * rideManifest.fps),
@@ -20,33 +21,41 @@ const clipDurations = rideManifest.clips.map((clip) =>
 type CameoProps = Pick<CradleCompositionProps, "selfieSrc" | "specimenId"> & {
   side: "left" | "right";
   duration: number;
-  scale?: number;
+  pose: AstronautPose;
+  scale: number;
+  bottom: number;
+  edge: number;
+  followsBall?: boolean;
 };
 
-function AstronautCameo({ selfieSrc, specimenId, side, duration, scale = 0.48 }: CameoProps) {
+function GroundedAstronaut({ selfieSrc, specimenId, side, duration, pose, scale, bottom, edge, followsBall = false }: CameoProps) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const drop = spring({ frame, fps, config: { damping: 14, stiffness: 120 } });
+  const arrival = spring({ frame, fps, config: { damping: 18, stiffness: 110 } });
   const opacity = interpolate(frame, [0, 8, duration - 12, duration], [0, 0.9, 0.9, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const drift = Math.sin(frame / 11) * 7;
+  const settleY = interpolate(arrival, [0, 1], [42, 0]);
+  const ballTrack = followsBall
+    ? interpolate(frame, [0, 24, 50, duration], [0, 82, 225, 132], { extrapolateRight: "clamp" })
+    : 0;
+  const faceTrack = followsBall ? interpolate(ballTrack, [0, 225], [-2, 3]) : 0;
 
   return (
     <AbsoluteFill style={{ pointerEvents: "none" }}>
       <div
         style={{
           position: "absolute",
-          [side]: side === "left" ? 36 : 28,
-          bottom: -62,
+          [side]: edge,
+          bottom,
           opacity,
-          transform: `translateY(${interpolate(drop, [0, 1], [-260, 0]) + drift}px) scale(${scale})`,
+          transform: `translate(${side === "left" ? ballTrack : -ballTrack}px, ${settleY}px) scale(${scale})`,
           transformOrigin: `50% 100%`,
           filter: "saturate(.82) contrast(1.05)",
         }}
       >
-        <AstronautSpecimen selfieSrc={selfieSrc} specimenId={specimenId} />
+        <AstronautSpecimen selfieSrc={selfieSrc} specimenId={specimenId} pose={pose} lookX={faceTrack} />
       </div>
       <div style={{ position: "absolute", inset: 0, opacity: opacity * 0.12, background: side === "left" ? "linear-gradient(90deg, rgba(155,200,199,.42), transparent 38%)" : "linear-gradient(270deg, rgba(165,43,37,.38), transparent 38%)", mixBlendMode: "screen" }} />
     </AbsoluteFill>
@@ -56,8 +65,8 @@ function AstronautCameo({ selfieSrc, specimenId, side, duration, scale = 0.48 }:
 function FinalDetection({ selfieSrc, specimenId }: Pick<CradleCompositionProps, "selfieSrc" | "specimenId">) {
   const frame = useCurrentFrame();
   const zoom = interpolate(frame, [0, 56], [0.56, 4.15], { extrapolateRight: "clamp" });
-  const helmetX = interpolate(frame, [0, 48], [806, 540], { extrapolateRight: "clamp" });
-  const helmetY = interpolate(frame, [0, 48], [1110, 610], { extrapolateRight: "clamp" });
+  const helmetX = interpolate(frame, [0, 48], [790, 540], { extrapolateRight: "clamp" });
+  const helmetY = interpolate(frame, [0, 48], [1575, 610], { extrapolateRight: "clamp" });
   const shade = interpolate(frame, [4, 36], [0.08, 0.74], { extrapolateRight: "clamp" });
   const copyOpacity = interpolate(frame, [30, 43], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const copyY = interpolate(frame, [30, 45], [28, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
@@ -70,9 +79,9 @@ function FinalDetection({ selfieSrc, specimenId }: Pick<CradleCompositionProps, 
         style={{
           position: "absolute",
           left: helmetX - 240,
-          top: helmetY - 110,
+          top: helmetY - 100,
           transform: `scale(${zoom})`,
-          transformOrigin: "240px 110px",
+          transformOrigin: "240px 100px",
         }}
       >
         <AstronautSpecimen selfieSrc={selfieSrc} specimenId={specimenId} />
@@ -102,10 +111,9 @@ export const CradleComposition = ({ selfieSrc, specimenId }: CradleCompositionPr
         );
       })}
 
-      <Sequence from={62} durationInFrames={54} name="Silent astronaut drop"><AstronautCameo selfieSrc={selfieSrc} specimenId={specimenId} side="right" duration={54} scale={0.46} /></Sequence>
-      <Sequence from={168} durationInFrames={58} name="Silent astronaut impact cameo"><AstronautCameo selfieSrc={selfieSrc} specimenId={specimenId} side="left" duration={58} scale={0.5} /></Sequence>
-      <Sequence from={265} durationInFrames={54} name="Silent astronaut tunnel cameo"><AstronautCameo selfieSrc={selfieSrc} specimenId={specimenId} side="right" duration={54} scale={0.43} /></Sequence>
-      <Sequence from={338} durationInFrames={48} name="Silent astronaut climax cameo"><AstronautCameo selfieSrc={selfieSrc} specimenId={specimenId} side="left" duration={48} scale={0.47} /></Sequence>
+      <Sequence from={150} durationInFrames={75} name="Grounded battlefield astronaut"><GroundedAstronaut selfieSrc={selfieSrc} specimenId={specimenId} side="left" duration={75} pose="kneeling" scale={0.55} bottom={20} edge={18} /></Sequence>
+      <Sequence from={228} durationInFrames={87} name="Prone astronaut follows pinball"><GroundedAstronaut selfieSrc={selfieSrc} specimenId={specimenId} side="left" duration={87} pose="prone" scale={0.62} bottom={72} edge={-150} followsBall /></Sequence>
+      <Sequence from={330} durationInFrames={56} name="Grounded creature battlefield astronaut"><GroundedAstronaut selfieSrc={selfieSrc} specimenId={specimenId} side="right" duration={56} pose="kneeling" scale={0.56} bottom={8} edge={14} /></Sequence>
       <Sequence from={390} durationInFrames={60} name="Pomegranate human detection"><FinalDetection selfieSrc={selfieSrc} specimenId={specimenId} /></Sequence>
 
       <AbsoluteFill style={{ pointerEvents: "none", background: "repeating-linear-gradient(0deg, transparent 0 5px, rgba(255,255,255,.018) 6px)", mixBlendMode: "screen" }} />

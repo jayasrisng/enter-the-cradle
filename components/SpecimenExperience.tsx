@@ -101,20 +101,22 @@ async function decodeImage(file: File) {
 
 async function normalizeImage(file: File) {
   const image = await decodeImage(file);
-  const scale = Math.min(1, MAX_IMAGE_EDGE / Math.max(image.width, image.height));
-  const width = Math.max(1, Math.round(image.width * scale));
-  const height = Math.max(1, Math.round(image.height * scale));
+  const cropSize = Math.max(1, Math.round(Math.min(image.width, image.height) * 0.58));
+  const cropX = Math.max(0, Math.round((image.width - cropSize) / 2));
+  const targetFaceY = image.height * (image.height > image.width ? 0.35 : 0.45);
+  const cropY = Math.max(0, Math.min(image.height - cropSize, Math.round(targetFaceY - cropSize / 2)));
+  const outputSize = Math.min(MAX_IMAGE_EDGE, 1200);
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d");
   if (!context) {
     image.release();
     throw new Error("This browser could not prepare the image.");
   }
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = outputSize;
+  canvas.height = outputSize;
   context.fillStyle = "#050506";
-  context.fillRect(0, 0, width, height);
-  context.drawImage(image.source, 0, 0, width, height);
+  context.fillRect(0, 0, outputSize, outputSize);
+  context.drawImage(image.source, cropX, cropY, cropSize, cropSize, 0, 0, outputSize, outputSize);
   image.release();
   return canvasToBlob(canvas);
 }

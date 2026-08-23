@@ -2,7 +2,7 @@
 
 ## Product Summary
 
-Enter the Cradle places the participant inside the existing cinematic Niiro ride as a silent astronaut specimen. The full approved film remains the experience. At selected beats, an astronaut with the participant's cropped face drops into a lower corner, observes the scene, and fades away. The finale zooms into the astronaut and identifies the participant as a human detected at the Pomegranate premiere show.
+Enter the Cradle places the participant inside the existing cinematic Niiro ride as a silent astronaut specimen. The full approved film remains the experience. At selected beats, an astronaut with the participant's face sealed inside the visor kneels on battlefield terrain or lies prone on the pinball track. The finale zooms into the grounded astronaut and identifies the participant as a human detected at the Pomegranate premiere show.
 
 ## User Problem
 
@@ -22,8 +22,9 @@ As a participant, I want my face to appear inside a recurring astronaut characte
 - Only the face is used inside an original fictional astronaut suit.
 - The face stays recognizable in every appearance.
 - The approved ride plays continuously with its original audio.
-- The astronaut is silent and appears in four short, lower-corner cameos.
-- Each cameo drops in, holds with restrained motion, and fades out.
+- The astronaut is silent and appears only in shots with a readable ground or track.
+- Battlefield cameos use a grounded one-knee pose.
+- The pinball cameo lies on its belly and travels laterally with the ball.
 - The astronaut does not obscure Niiro or primary scene action.
 - The finale zooms into the same astronaut and shows the persistent specimen ID.
 
@@ -33,13 +34,13 @@ As a participant, I want my face to appear inside a recurring astronaut characte
 
 The approved ride opens without an astronaut overlay, allowing the film world to establish itself.
 
-### 2. First Sighting — approximately 2–4 seconds
+### 2. Grounded Battlefield Sighting — approximately 5–7 seconds
 
-The astronaut drops into the lower-right corner, stands silently with subtle breathing motion, and fades before the next beat.
+The astronaut settles into a low one-knee pose at the bottom terrain line and fades before the scene loses its ground plane.
 
-### 3. Alternating Sightings — approximately 5–11 seconds
+### 3. Prone Pinball Tracking — approximately 8–10 seconds
 
-Three additional appearances alternate between lower corners and align with visually relevant scenes. Scale and lighting change slightly to sit naturally within each shot.
+The astronaut lies on its belly on the pinball track and moves laterally as the ball travels. A later creature battlefield shot returns to the grounded kneeling pose.
 
 ### 4. Human Detection Finale — approximately 13–15 seconds
 
@@ -63,7 +64,7 @@ The astronaut returns and the camera progressively zooms toward the helmet. A da
 - If no selfie source is available, the composition uses its existing neutral placeholder rather than crashing.
 - Wide or tall photos are cropped into the helmet using `object-fit: cover`.
 - A face near the edge of a photo may be imperfectly centered; automated face detection is a later enhancement.
-- The astronaut is kept within safe lower-corner bounds on the 9:16 canvas.
+- The astronaut is kept within safe ground-plane bounds on the 9:16 canvas.
 
 ## Privacy and Safety
 
