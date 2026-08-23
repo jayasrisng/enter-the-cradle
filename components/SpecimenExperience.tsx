@@ -185,17 +185,32 @@ export function SpecimenExperience() {
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       setShareStatus("PERSONALIZED VIDEO DOWNLOADED");
     } catch {
-      setShareStatus("VIDEO RENDERING NEEDS DESKTOP CHROME OR A RECENT MOBILE BROWSER");
+      setShareStatus("THIS BROWSER CANNOT ENCODE VIDEO — OPEN THIS PAGE IN CHROME TO DOWNLOAD");
     }
+  }
+
+  async function shareExperienceLink(text: string) {
+    if (navigator.share) {
+      await navigator.share({ title: "Enter the Cradle", text, url: window.location.href });
+      setShareStatus("EXPERIENCE LINK SHARED");
+      return;
+    }
+    await navigator.clipboard.writeText(`${text} ${window.location.href}`);
+    setShareStatus("EXPERIENCE LINK COPIED");
   }
 
   async function shareSpecimen() {
     const text = `Human detected at the Pomegranate premiere show — Specimen #${identity?.specimenId}.`;
     try {
       if (!renderedVideoRef.current) {
-        await renderPersonalizedVideo();
-        setShareStatus("VIDEO READY — TAP SHARE AGAIN");
-        return;
+        try {
+          await renderPersonalizedVideo();
+          setShareStatus("VIDEO READY — TAP SHARE AGAIN");
+          return;
+        } catch {
+          await shareExperienceLink(text);
+          return;
+        }
       }
       const file = new File([renderedVideoRef.current], `enter-the-cradle-${identity?.specimenId}.mp4`, { type: "video/mp4" });
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
@@ -280,18 +295,22 @@ export function SpecimenExperience() {
     setIsPreparingImage(true);
     try {
       const normalizedImage = await normalizeImage(file);
-      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
-      const nextPreviewUrl = URL.createObjectURL(normalizedImage);
-      previewUrlRef.current = nextPreviewUrl;
-      setPreviewUrl(nextPreviewUrl);
-      setNormalizedSelfie(normalizedImage);
-      renderedVideoRef.current = null;
-      setShareStatus("");
+      applyPreparedImage(normalizedImage);
     } catch {
       setUploadError("The image could not be read. Try exporting it as a standard JPEG and upload it again.");
     } finally {
       setIsPreparingImage(false);
     }
+  }
+
+  function applyPreparedImage(image: Blob) {
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+    const nextPreviewUrl = URL.createObjectURL(image);
+    previewUrlRef.current = nextPreviewUrl;
+    setPreviewUrl(nextPreviewUrl);
+    setNormalizedSelfie(image);
+    renderedVideoRef.current = null;
+    setShareStatus("");
   }
 
   async function handleImageSelection(event: ChangeEvent<HTMLInputElement>) {
@@ -306,9 +325,22 @@ export function SpecimenExperience() {
       setUploadError("The camera is still starting. Try capture again in a moment.");
       return;
     }
+    const displayWidth = video.clientWidth;
+    const displayHeight = video.clientHeight;
+    const scale = Math.max(displayWidth / video.videoWidth, displayHeight / video.videoHeight);
+    const renderedWidth = video.videoWidth * scale;
+    const renderedHeight = video.videoHeight * scale;
+    const hiddenX = (renderedWidth - displayWidth) / 2;
+    const hiddenY = (renderedHeight - displayHeight) / 2;
+    const guideSize = displayWidth * 0.72;
+    const guideX = displayWidth * 0.14;
+    const guideY = displayHeight * 0.12;
+    const sourceX = (hiddenX + guideX) / scale;
+    const sourceY = (hiddenY + guideY) / scale;
+    const sourceSize = guideSize / scale;
     const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    canvas.width = 1200;
+    canvas.height = 1200;
     const context = canvas.getContext("2d");
     if (!context) {
       setUploadError("This browser could not capture the camera frame.");
@@ -316,10 +348,10 @@ export function SpecimenExperience() {
     }
     context.translate(canvas.width, 0);
     context.scale(-1, 1);
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    context.drawImage(video, sourceX, sourceY, sourceSize, sourceSize, 0, 0, canvas.width, canvas.height);
     const blob = await canvasToBlob(canvas);
     stopCamera();
-    await prepareImage(new File([blob], "cradle-selfie.jpg", { type: "image/jpeg" }));
+    applyPreparedImage(blob);
   }
 
   function processSpecimen() {
@@ -373,7 +405,10 @@ export function SpecimenExperience() {
             </div>
             <div className={`selfie-port ${previewUrl ? "has-image" : ""}`}>
               {isCameraOpen ? (
-                <video ref={cameraPreviewRef} className="camera-preview" autoPlay muted playsInline aria-label="Live selfie camera preview" />
+                <>
+                  <video ref={cameraPreviewRef} className="camera-preview" autoPlay muted playsInline aria-label="Live selfie camera preview" />
+                  <div className="camera-alignment" aria-hidden="true"><div className="camera-oval"><span className="alignment-eye eye-left" /><span className="alignment-eye eye-right" /></div><span>ALIGN FACE INSIDE OVAL</span></div>
+                </>
               ) : previewUrl ? (
                 <Image src={previewUrl} alt="Selected selfie preview" fill sizes="(max-width: 640px) 76vw, 360px" unoptimized style={{ objectFit: "cover" }} />
               ) : (
