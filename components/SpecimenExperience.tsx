@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ChangeEvent, CSSProperties } from "react";
 import { SPECIMEN_OUTCOMES } from "@/lib/specimen";
 import type { SpecimenOutcome } from "@/lib/specimen";
-import { CradleComposition } from "@/remotion/compositions/CradleComposition";
+import { CRADLE_DURATION_IN_FRAMES, CradleComposition } from "@/remotion/compositions/CradleComposition";
 
 type Stage = "landing" | "upload" | "scanning" | "acquired" | "ride";
 type SpecimenIdentity = { specimenId: string; outcome: SpecimenOutcome };
@@ -131,6 +131,7 @@ export function SpecimenExperience() {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isPreparingImage, setIsPreparingImage] = useState(false);
+  const [rideRun, setRideRun] = useState(0);
   const previewUrlRef = useRef<string | null>(null);
   const renderedVideoRef = useRef<Blob | null>(null);
   const cameraPreviewRef = useRef<HTMLVideoElement | null>(null);
@@ -152,7 +153,7 @@ export function SpecimenExperience() {
           width: 1080,
           height: 1920,
           fps: 30,
-          durationInFrames: 450,
+          durationInFrames: CRADLE_DURATION_IN_FRAMES,
           defaultProps: { selfieSrc: previewUrl, specimenId: identity.specimenId, outcome: identity.outcome },
         },
         inputProps: { selfieSrc: previewUrl, specimenId: identity.specimenId, outcome: identity.outcome },
@@ -364,6 +365,17 @@ export function SpecimenExperience() {
     }, 3600);
   }
 
+  function enterRide() {
+    setRideRun((run) => run + 1);
+    setShareStatus("");
+    setStage("ride");
+  }
+
+  function returnToVerdict() {
+    setShareStatus("");
+    setStage("acquired");
+  }
+
   function resetSelfie() {
     stopCamera();
     if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
@@ -458,7 +470,7 @@ export function SpecimenExperience() {
             <p className="specimen-number">SPECIMEN #{identity?.specimenId ?? "----"}</p>
             <h1>SPECIMEN ACQUIRED</h1>
             <p className="ready-question">READY TO ENTER THE CRADLE?</p>
-            <button className="primary-action" type="button" onClick={() => setStage("ride")}><span>ENTER THE CRADLE</span><b aria-hidden="true">↘</b></button>
+            <button className="primary-action" type="button" onClick={enterRide}><span>ENTER THE CRADLE</span><b aria-hidden="true">↘</b></button>
           </div>
         )}
 
@@ -470,13 +482,14 @@ export function SpecimenExperience() {
             </div>
             <div className="ride-player-shell">
               <Player
+                key={rideRun}
                 component={CradleComposition}
                 inputProps={{
                   selfieSrc: previewUrl,
                   specimenId: identity.specimenId,
                   outcome: identity.outcome,
                 }}
-                durationInFrames={450}
+                durationInFrames={CRADLE_DURATION_IN_FRAMES}
                 compositionWidth={1080}
                 compositionHeight={1920}
                 fps={30}
@@ -491,7 +504,7 @@ export function SpecimenExperience() {
               <button className="secondary-action" type="button" onClick={shareSpecimen} disabled={isRenderingVideo}>SHARE VIDEO</button>
             </div>
             {shareStatus && <p className="ride-share-status" role="status">{shareStatus}</p>}
-            <button className="secondary-action ride-again" type="button" onClick={() => setStage("acquired")}>RETURN TO VERDICT GATE</button>
+            <button className="secondary-action ride-again" type="button" onClick={returnToVerdict}>RETURN TO VERDICT GATE</button>
           </div>
         )}
       </section>

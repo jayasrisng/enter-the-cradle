@@ -5,7 +5,6 @@ import {
   OffthreadVideo,
   Sequence,
   spring,
-  staticFile,
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
@@ -13,6 +12,9 @@ import type { CradleCompositionProps } from "../../lib/specimen";
 import rideManifest from "../../public/ride-clips/manifest.json";
 import { AstronautSpecimen } from "../components/AstronautSpecimen";
 import type { AstronautPose } from "../components/AstronautSpecimen";
+
+export const CRADLE_DURATION_IN_FRAMES = 480;
+const RIDE_MEDIA_BASE_URL = "https://github.com/jayasrisng/enter-the-cradle/releases/download/web-media-v1";
 
 const clipDurations = rideManifest.clips.map((clip) =>
   Math.round(clip.durationSeconds * rideManifest.fps),
@@ -127,7 +129,7 @@ export const CradleComposition = ({ selfieSrc, specimenId }: CradleCompositionPr
         const sequenceStart = clipDurations.slice(0, index).reduce((total, duration) => total + duration, 0);
         return (
           <Sequence key={clip.filename} from={sequenceStart} durationInFrames={durationInFrames} name={clip.role}>
-            <OffthreadVideo src={staticFile(`ride-clips/${clip.filename}`)} style={{ height: "100%", objectFit: "cover", width: "100%" }} />
+            <OffthreadVideo src={`${RIDE_MEDIA_BASE_URL}/${clip.filename}`} style={{ height: "100%", objectFit: "cover", width: "100%" }} />
           </Sequence>
         );
       })}
@@ -135,7 +137,7 @@ export const CradleComposition = ({ selfieSrc, specimenId }: CradleCompositionPr
       <Sequence from={150} durationInFrames={75} name="Grounded battlefield astronaut"><GroundedAstronaut selfieSrc={selfieSrc} specimenId={specimenId} side="left" duration={75} pose="kneeling" scale={0.55} bottom={20} edge={18} /></Sequence>
       <Sequence from={228} durationInFrames={87} name="Prone astronaut follows pinball"><GroundedAstronaut selfieSrc={selfieSrc} specimenId={specimenId} side="left" duration={87} pose="prone" scale={0.62} bottom={72} edge={-150} followsBall /></Sequence>
       <Sequence from={330} durationInFrames={56} name="Grounded creature battlefield astronaut"><GroundedAstronaut selfieSrc={selfieSrc} specimenId={specimenId} side="right" duration={56} pose="kneeling" scale={0.56} bottom={8} edge={14} /></Sequence>
-      <Sequence from={390} durationInFrames={60} name="Pomegranate human detection"><FinalDetection selfieSrc={selfieSrc} specimenId={specimenId} /></Sequence>
+      <Sequence from={390} durationInFrames={90} name="Pomegranate human detection"><FinalDetection selfieSrc={selfieSrc} specimenId={specimenId} /></Sequence>
 
       <AbsoluteFill style={{ pointerEvents: "none", background: "repeating-linear-gradient(0deg, transparent 0 5px, rgba(255,255,255,.018) 6px)", mixBlendMode: "screen" }} />
     </AbsoluteFill>
