@@ -214,6 +214,8 @@ button, label { -webkit-tap-highlight-color: transparent; }
 .ride-heading > p:last-child { margin: 0; text-align: right; }
 .ride-player-shell { width: min(76vw, 360px); aspect-ratio: 9 / 16; margin: 0 auto; overflow: hidden; border: 1px solid rgb(155 200 199 / 28%); background: #050506; box-shadow: 0 24px 90px rgb(0 0 0 / 65%), 0 0 52px rgb(155 200 199 / 8%); }
 .ride-note { margin: 18px 0; color: var(--muted); font-size: 0.48rem; }
+.ride-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 0 auto 12px; }
+.ride-share-status { min-height: 18px; margin: 0 0 12px; color: var(--cyan); font-size: 0.48rem; letter-spacing: 0.14em; }
 .ride-again { margin: 0 auto; }
 
 @keyframes screen-enter { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }

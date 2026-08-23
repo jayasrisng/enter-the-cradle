@@ -28,6 +28,27 @@ type CameoProps = Pick<CradleCompositionProps, "selfieSrc" | "specimenId"> & {
   followsBall?: boolean;
 };
 
+function HologramSpecimen({ selfieSrc, specimenId, pose = "standing", lookX = 0 }: Pick<CameoProps, "selfieSrc" | "specimenId"> & { pose?: AstronautPose; lookX?: number }) {
+  const frame = useCurrentFrame();
+  const glitch = frame % 19 < 3;
+  const slice = 18 + ((frame * 7) % 58);
+
+  return (
+    <div style={{ position: "relative", mixBlendMode: "screen" }}>
+      <div style={{ opacity: glitch ? 0.62 : 0.82, filter: "saturate(.72) contrast(1.12) drop-shadow(0 0 14px rgba(84,229,255,.45))" }}>
+        <AstronautSpecimen selfieSrc={selfieSrc} specimenId={specimenId} pose={pose} lookX={lookX} />
+      </div>
+      <div style={{ position: "absolute", inset: 0, opacity: glitch ? 0.34 : 0.12, transform: `translateX(${glitch ? -10 : -3}px)`, filter: "sepia(1) saturate(7) hue-rotate(130deg)", clipPath: `inset(${slice}% 0 ${Math.max(0, 72 - slice)}% 0)` }}>
+        <AstronautSpecimen selfieSrc={selfieSrc} specimenId={specimenId} pose={pose} lookX={lookX} />
+      </div>
+      <div style={{ position: "absolute", inset: 0, opacity: glitch ? 0.24 : 0.08, transform: `translateX(${glitch ? 9 : 2}px)`, filter: "sepia(1) saturate(7) hue-rotate(300deg)", clipPath: `inset(${Math.max(0, slice - 14)}% 0 ${Math.max(0, 84 - slice)}% 0)` }}>
+        <AstronautSpecimen selfieSrc={selfieSrc} specimenId={specimenId} pose={pose} lookX={lookX} />
+      </div>
+      <div style={{ position: "absolute", inset: 0, opacity: 0.18, background: "repeating-linear-gradient(180deg, transparent 0 5px, rgba(120,235,255,.46) 6px, transparent 7px)", mixBlendMode: "screen", pointerEvents: "none" }} />
+    </div>
+  );
+}
+
 function GroundedAstronaut({ selfieSrc, specimenId, side, duration, pose, scale, bottom, edge, followsBall = false }: CameoProps) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -55,7 +76,7 @@ function GroundedAstronaut({ selfieSrc, specimenId, side, duration, pose, scale,
           filter: "saturate(.82) contrast(1.05)",
         }}
       >
-        <AstronautSpecimen selfieSrc={selfieSrc} specimenId={specimenId} pose={pose} lookX={faceTrack} />
+        <HologramSpecimen selfieSrc={selfieSrc} specimenId={specimenId} pose={pose} lookX={faceTrack} />
       </div>
       <div style={{ position: "absolute", inset: 0, opacity: opacity * 0.12, background: side === "left" ? "linear-gradient(90deg, rgba(155,200,199,.42), transparent 38%)" : "linear-gradient(270deg, rgba(165,43,37,.38), transparent 38%)", mixBlendMode: "screen" }} />
     </AbsoluteFill>
@@ -84,7 +105,7 @@ function FinalDetection({ selfieSrc, specimenId }: Pick<CradleCompositionProps, 
           transformOrigin: "240px 100px",
         }}
       >
-        <AstronautSpecimen selfieSrc={selfieSrc} specimenId={specimenId} />
+        <HologramSpecimen selfieSrc={selfieSrc} specimenId={specimenId} />
       </div>
 
       <div style={{ position: "absolute", zIndex: 10, left: 54, right: 54, bottom: 112, opacity: copyOpacity, transform: `translateY(${copyY}px)`, textAlign: "center", textShadow: "0 4px 24px rgba(0,0,0,.85)" }}>

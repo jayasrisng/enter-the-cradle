@@ -126,9 +126,94 @@ export function SpecimenExperience() {
   const [identity, setIdentity] = useState<SpecimenIdentity | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [normalizedSelfie, setNormalizedSelfie] = useState<Blob | null>(null);
+  const [shareStatus, setShareStatus] = useState("");
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isPreparingImage, setIsPreparingImage] = useState(false);
   const previewUrlRef = useRef<string | null>(null);
+
+  async function createSpecimenCard() {
+    if (!previewUrl || !identity) throw new Error("Specimen unavailable.");
+    const portrait = new window.Image();
+    await new Promise<void>((resolve, reject) => {
+      portrait.onload = () => resolve();
+      portrait.onerror = () => reject(new Error("Portrait could not be loaded."));
+      portrait.src = previewUrl;
+    });
+    const canvas = document.createElement("canvas");
+    canvas.width = 1080;
+    canvas.height = 1350;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Card could not be created.");
+    const gradient = context.createLinearGradient(0, 0, 1080, 1350);
+    gradient.addColorStop(0, "#061517");
+    gradient.addColorStop(0.55, "#050506");
+    gradient.addColorStop(1, "#210909");
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, 1080, 1350);
+    context.strokeStyle = "rgba(155,200,199,.55)";
+    context.lineWidth = 3;
+    context.strokeRect(54, 54, 972, 1242);
+    context.save();
+    context.beginPath();
+    context.ellipse(540, 500, 300, 275, 0, 0, Math.PI * 2);
+    context.clip();
+    context.drawImage(portrait, 230, 190, 620, 620);
+    context.restore();
+    context.strokeStyle = "#d8d2c7";
+    context.lineWidth = 18;
+    context.beginPath();
+    context.ellipse(540, 500, 315, 290, 0, 0, Math.PI * 2);
+    context.stroke();
+    context.textAlign = "center";
+    context.fillStyle = "#f0ede5";
+    context.font = "700 86px Georgia, serif";
+    context.fillText("HUMAN DETECTED", 540, 920);
+    context.fillStyle = "#9bc8c7";
+    context.font = "24px Arial, sans-serif";
+    context.fillText("AT", 540, 980);
+    context.fillStyle = "#f0ede5";
+    context.font = "700 94px Georgia, serif";
+    context.fillText("POMEGRANATE", 540, 1080);
+    context.fillStyle = "#d8d2c7";
+    context.font = "24px Arial, sans-serif";
+    context.fillText(`PREMIERE SHOW // SPECIMEN #${identity.specimenId}`, 540, 1150);
+    return new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Card export failed.")), "image/png"));
+  }
+
+  async function downloadSpecimenCard() {
+    try {
+      const blob = await createSpecimenCard();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `enter-the-cradle-${identity?.specimenId ?? "specimen"}.png`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      setShareStatus("SPECIMEN CARD DOWNLOADED");
+    } catch {
+      setShareStatus("DOWNLOAD FAILED — TRY AGAIN");
+    }
+  }
+
+  async function shareSpecimen() {
+    const text = `Human detected at the Pomegranate premiere show — Specimen #${identity?.specimenId}.`;
+    try {
+      const blob = await createSpecimenCard();
+      const file = new File([blob], `enter-the-cradle-${identity?.specimenId}.png`, { type: "image/png" });
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ title: "Enter the Cradle", text, files: [file] });
+      } else if (navigator.share) {
+        await navigator.share({ title: "Enter the Cradle", text, url: window.location.href });
+      } else {
+        await navigator.clipboard.writeText(`${text} ${window.location.href}`);
+        setShareStatus("SHARE LINK COPIED");
+        return;
+      }
+      setShareStatus("TRANSMISSION SHARED");
+    } catch (error) {
+      if ((error as Error).name !== "AbortError") setShareStatus("SHARE FAILED — TRY AGAIN");
+    }
+  }
   const scanTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -294,12 +379,17 @@ export function SpecimenExperience() {
               />
             </div>
             <p className="ride-note">YOUR IMAGE REMAINS ON THIS DEVICE</p>
+            <div className="ride-actions">
+              <button className="secondary-action" type="button" onClick={downloadSpecimenCard}>DOWNLOAD CARD</button>
+              <button className="secondary-action" type="button" onClick={shareSpecimen}>SHARE EXPERIENCE</button>
+            </div>
+            {shareStatus && <p className="ride-share-status" role="status">{shareStatus}</p>}
             <button className="secondary-action ride-again" type="button" onClick={() => setStage("acquired")}>RETURN TO VERDICT GATE</button>
           </div>
         )}
       </section>
 
-      <footer className="system-footer"><span>SESSION // {identity?.specimenId ?? "UNASSIGNED"}</span><span>NO NETWORK TRANSFER</span></footer>
+      <footer className="system-footer"><span>SESSION // {identity?.specimenId ?? "UNASSIGNED"}</span><span>LOCAL UNTIL SHARED</span></footer>
     </main>
   );
 }

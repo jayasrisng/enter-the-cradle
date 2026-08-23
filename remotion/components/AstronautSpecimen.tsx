@@ -21,7 +21,7 @@ const poses = {
     src: "overlays/astronaut-kneel.png",
     width: 480,
     height: 720,
-    face: { left: 181, top: 60, width: 120, height: 105, rotate: 0, imageScale: 1.45 },
+    face: { left: 168, top: 47, width: 144, height: 130, rotate: 0, imageScale: 1.05 },
     id: { left: 218, top: 376 },
   },
   prone: {
@@ -79,7 +79,7 @@ export function AstronautSpecimen({ selfieSrc, specimenId, pose = "standing", lo
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              objectPosition: "72% 25%",
+              objectPosition: pose === "kneeling" ? "58% 34%" : "72% 25%",
               transform: `scale(${config.face.imageScale})`,
               transformOrigin: "50% 42%",
               filter: "saturate(.82) contrast(1.06)",

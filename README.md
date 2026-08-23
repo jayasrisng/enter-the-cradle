@@ -28,7 +28,7 @@ Selfies are normalized locally for preview and are not uploaded or stored by the
 
 ## Personalized ride
 
-The Remotion composition accepts `selfieSrc`, `specimenId`, and `outcome` inputs. Prompt 5.5 creates a face-focused local crop and places it inside the visor of an original astronaut specimen. The complete approved ride keeps playing while the silent astronaut stays physically grounded: kneeling in battlefield shots, lying prone and tracking the pinball, and standing on the ground before the final helmet zoom. The finale presents the Pomegranate human-detection message in a tall Gothic display style.
+The Remotion composition accepts `selfieSrc`, `specimenId`, and `outcome` inputs. Prompt 5.5 creates a face-focused local crop and places it inside the visor of an original astronaut specimen. The complete approved ride keeps playing while the silent astronaut stays physically grounded: kneeling in battlefield shots, lying prone and tracking the pinball, and standing on the ground before the final helmet zoom. A cyan/red scan-line glitch treatment makes each appearance read as a holographic transmission. The finale presents the Pomegranate human-detection message in a tall Gothic display style.
 
 This is an authored character illusion, not a photorealistic face swap or generated human performance. It requires only one selfie, uses no external AI API at runtime, and keeps the image local in the browser preview. The exact product boundary and acceptance criteria are documented in `docs/prompt-5-5-scope.md` and `docs/prompt-5-5-prd.md`.
 
@@ -39,6 +39,8 @@ pnpm remotion:render:personalized
 ```
 
 This creates `output/enter-the-cradle-personalized.mp4`. Both the local portrait and rendered video are ignored by Git. The server-side render/download pipeline is intentionally deferred to Prompt 6.
+
+The browser experience can download a personalized specimen card as PNG and share that card through the device share sheet (or copy the experience link when native sharing is unavailable). These exports are created locally and only leave the device when the participant explicitly shares them.
 
 ## Local media
 
