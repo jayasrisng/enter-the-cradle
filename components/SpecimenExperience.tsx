@@ -128,10 +128,13 @@ export function SpecimenExperience() {
   const [normalizedSelfie, setNormalizedSelfie] = useState<Blob | null>(null);
   const [shareStatus, setShareStatus] = useState("");
   const [isRenderingVideo, setIsRenderingVideo] = useState(false);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isPreparingImage, setIsPreparingImage] = useState(false);
   const previewUrlRef = useRef<string | null>(null);
   const renderedVideoRef = useRef<Blob | null>(null);
+  const cameraPreviewRef = useRef<HTMLVideoElement | null>(null);
+  const cameraStreamRef = useRef<MediaStream | null>(null);
 
   async function renderPersonalizedVideo() {
     if (renderedVideoRef.current) return renderedVideoRef.current;
@@ -215,18 +218,50 @@ export function SpecimenExperience() {
     return () => {
       if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
       if (scanTimerRef.current) window.clearTimeout(scanTimerRef.current);
+      cameraStreamRef.current?.getTracks().forEach((track) => track.stop());
     };
   }, []);
+
+  useEffect(() => {
+    const video = cameraPreviewRef.current;
+    const stream = cameraStreamRef.current;
+    if (!isCameraOpen || !video || !stream) return;
+    video.srcObject = stream;
+    void video.play();
+  }, [isCameraOpen]);
 
   function beginIntake() {
     setIdentity(getSessionIdentity());
     setStage("upload");
   }
 
-  async function handleImageSelection(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!file) return;
+  function stopCamera() {
+    cameraStreamRef.current?.getTracks().forEach((track) => track.stop());
+    cameraStreamRef.current = null;
+    if (cameraPreviewRef.current) cameraPreviewRef.current.srcObject = null;
+    setIsCameraOpen(false);
+  }
+
+  async function openCamera() {
+    setUploadError(null);
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setUploadError("Live camera is unavailable in this browser. Use Choose Photo instead.");
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: { facingMode: "user", width: { ideal: 1080 }, height: { ideal: 1350 } },
+      });
+      cameraStreamRef.current = stream;
+      setIsCameraOpen(true);
+    } catch {
+      stopCamera();
+      setUploadError("Camera access was blocked. Allow camera permission, or use Choose Photo.");
+    }
+  }
+
+  async function prepareImage(file: File) {
     setUploadError(null);
     const extension = fileExtension(file.name);
     const isHeic = ["heic", "heif"].includes(extension) || ["image/heic", "image/heif"].includes(file.type);
@@ -259,8 +294,37 @@ export function SpecimenExperience() {
     }
   }
 
+  async function handleImageSelection(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (file) await prepareImage(file);
+  }
+
+  async function captureSelfie() {
+    const video = cameraPreviewRef.current;
+    if (!video || !video.videoWidth || !video.videoHeight) {
+      setUploadError("The camera is still starting. Try capture again in a moment.");
+      return;
+    }
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const context = canvas.getContext("2d");
+    if (!context) {
+      setUploadError("This browser could not capture the camera frame.");
+      return;
+    }
+    context.translate(canvas.width, 0);
+    context.scale(-1, 1);
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const blob = await canvasToBlob(canvas);
+    stopCamera();
+    await prepareImage(new File([blob], "cradle-selfie.jpg", { type: "image/jpeg" }));
+  }
+
   function processSpecimen() {
     if (!normalizedSelfie || !previewUrl) return;
+    stopCamera();
     setStage("scanning");
     scanTimerRef.current = window.setTimeout(() => {
       setStage("acquired");
@@ -269,6 +333,7 @@ export function SpecimenExperience() {
   }
 
   function resetSelfie() {
+    stopCamera();
     if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
     previewUrlRef.current = null;
     setPreviewUrl(null);
@@ -307,7 +372,9 @@ export function SpecimenExperience() {
               <p>Center your face and look toward the camera. Your face will appear inside the specimen helmet.</p>
             </div>
             <div className={`selfie-port ${previewUrl ? "has-image" : ""}`}>
-              {previewUrl ? (
+              {isCameraOpen ? (
+                <video ref={cameraPreviewRef} className="camera-preview" autoPlay muted playsInline aria-label="Live selfie camera preview" />
+              ) : previewUrl ? (
                 <Image src={previewUrl} alt="Selected selfie preview" fill sizes="(max-width: 640px) 76vw, 360px" unoptimized style={{ objectFit: "cover" }} />
               ) : (
                 <div className="port-empty" aria-hidden="true"><div className="face-guide"><span className="guide-eye guide-eye-left" /><span className="guide-eye guide-eye-right" /></div><span>ALIGN HUMAN FACE</span></div>
@@ -315,8 +382,14 @@ export function SpecimenExperience() {
               <span className="corner corner-one" /><span className="corner corner-two" /><span className="corner corner-three" /><span className="corner corner-four" />
             </div>
             <div className="upload-actions">
-              <label className="secondary-action" htmlFor="selfie-camera">{isPreparingImage ? "PREPARING IMAGE…" : "TAKE SELFIE"}</label>
-              <input id="selfie-camera" className="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" capture="user" onChange={handleImageSelection} disabled={isPreparingImage} />
+              {isCameraOpen ? (
+                <>
+                  <button className="secondary-action" type="button" onClick={captureSelfie}>CAPTURE FACE</button>
+                  <button className="text-action" type="button" onClick={stopCamera}>CANCEL</button>
+                </>
+              ) : (
+                <button className="secondary-action" type="button" onClick={openCamera} disabled={isPreparingImage}>{isPreparingImage ? "PREPARING IMAGE…" : "TAKE SELFIE"}</button>
+              )}
               <label className="secondary-action" htmlFor="selfie-upload">CHOOSE PHOTO</label>
               <input id="selfie-upload" className="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" onChange={handleImageSelection} disabled={isPreparingImage} />
               {previewUrl && <button className="text-action" type="button" onClick={resetSelfie}>REMOVE</button>}
